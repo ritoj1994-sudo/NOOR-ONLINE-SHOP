@@ -1,19 +1,21 @@
 # NOOR ONLINE SHOP
 
-বাংলাদেশের জন্য একটি Expo / React Native Android shopping app-এর প্রাথমিক সংস্করণ।
+Bangladesh-focused multi-category marketplace starter app built with Expo / React Native.
 
-## চালানোর নিয়ম
-1. Node.js ইনস্টল করুন।
-2. এই ফোল্ডারে টার্মিনাল খুলে `npm install` চালান।
-3. `npx expo start` চালান।
-4. Expo Go দিয়ে QR কোড স্ক্যান করুন।
+## Included
+- Bangla storefront, category filters and product search
+- Cart quantity controls and total calculation
+- Customer name, phone and delivery address
+- COD, bKash and Nagad payment choices (payment credentials are intentionally placeholders)
+- WhatsApp order handoff to 01838345812
+- Local product add/remove admin screen
+- Local persistence on the same device with AsyncStorage
 
-## এই সংস্করণে আছে
-- বাংলা হোম স্ক্রিন, পণ্য তালিকা ও ক্যাটাগরি
-- পণ্য সার্চ
-- কার্টে পণ্য যোগ/বিয়োগ
-- ডেলিভারি তথ্য
-- WhatsApp-এ অর্ডারের খসড়া পাঠানো (01838345812)
+## Run
+1. Install Node.js and Expo tooling on a computer.
+2. Run `npm install`
+3. Run `npx expo start`
+4. Scan the QR code using Expo Go.
 
-## গুরুত্বপূর্ণ
-এটি একটি প্রাথমিক ডেমো। পণ্য/দাম নমুনা হিসেবে দেওয়া। বাস্তব পেমেন্ট গেটওয়ে, ডাটাবেস, লগইন, অর্ডার ম্যানেজমেন্ট ও অ্যাডমিন প্যানেল এখনো যুক্ত হয়নি। WhatsApp নম্বর ও পণ্য তালিকা App.js-এ পরিবর্তন করতে হবে।
+## Important before public launch
+This is a starter app, not a production marketplace. Product/admin data is stored only on the device. There is no shared cloud database, secure admin authentication, courier API, payment gateway integration, order dashboard, inventory synchronization, or production build. Do not collect real customer/payment data until these are implemented and tested. Add real bKash/Nagad merchant payment integration only through official merchant APIs and never store secret keys in the app.

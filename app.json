@@ -5,12 +5,14 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#123b2b"
+    },
     "android": {
       "package": "com.noor.onlineshop"
     },
-    "splash": {
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+    "ios": {
+      "bundleIdentifier": "com.noor.onlineshop"
     }
   }
 }
