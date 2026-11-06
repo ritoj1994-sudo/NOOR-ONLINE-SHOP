@@ -57,14 +57,14 @@ export default function App(){
   loadShop();
  };
  const adminAuth=async()=>{
-  if(email.trim().toLowerCase()!==ADMIN_EMAIL.toLowerCase()){Alert.alert("অনুমতি নেই","নির্ধারিত অ্যাডমিন ইমেইল ব্যবহার করুন।");return;}
-  if(password.length<6){Alert.alert("পাসওয়ার্ড","কমপক্ষে ৬ অক্ষরের পাসওয়ার্ড দিন।");return;}
+  if(email.trim().toLowerCase()!==ADMIN_EMAIL.toLowerCase()){setNotice("অনুমতি নেই: নির্ধারিত অ্যাডমিন ইমেইল ব্যবহার করুন।");return;}
+  if(password.length<6){setNotice("পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।");return;}
   setBusy(true);
   const r=authMode==="signup"?await supabase.auth.signUp({email:ADMIN_EMAIL,password}):await supabase.auth.signInWithPassword({email:ADMIN_EMAIL,password});
   setBusy(false);
-  if(r.error){Alert.alert("লগইন হয়নি",err(r.error));return;}
-  if(authMode==="signup"&&!r.data.session)Alert.alert("ইমেইল যাচাই করুন","আপনার ইমেইলে verification link পাঠানো হয়েছে। লিংক খুলে তারপর লগইন করুন।");
-  else setSession(r.data.session);
+  if(r.error){setNotice("অ্যাকাউন্ট তৈরি/লগইন হয়নি: "+err(r.error));return;}
+  if(authMode==="signup"&&!r.data.session)setNotice("অ্যাকাউন্ট তৈরির অনুরোধ পাঠানো হয়েছে। ইমেইলে verification link এলে সেটি খুলুন, তারপর লগইন করুন।");
+  else {setSession(r.data.session);setNotice("অ্যাডমিন লগইন সফল হয়েছে।");}
  };
  const addProduct=async()=>{
   const price=Number(pPrice),stock=Number(pStock);
@@ -116,11 +116,11 @@ export default function App(){
 
   {page==="admin"&&<KeyboardAvoidingView style={{flex:1}} behavior={Platform.OS==="ios"?"padding":undefined}>
    {(!session||session.user.email?.toLowerCase()!==ADMIN_EMAIL.toLowerCase())?<ScrollView contentContainerStyle={{padding:16}}>
-    <Text style={s.heading}>অ্যাডমিন লগইন</Text><Text style={s.muted}>নির্ধারিত ইমেইল: {ADMIN_EMAIL}</Text>
+    <Text style={s.heading}>{authMode==="signup"?"প্রথমবার অ্যাডমিন অ্যাকাউন্ট তৈরি করুন":"অ্যাডমিন লগইন"}</Text><Text style={s.muted}>নির্ধারিত ইমেইল: {ADMIN_EMAIL}</Text><Text style={{color:"#17633f",fontWeight:"bold",marginVertical:8}}>{authMode==="signup"?"নতুন অ্যাকাউন্ট তৈরি করার মোড চালু আছে।":"আগের অ্যাকাউন্ট দিয়ে লগইন করুন।"}</Text>
     {field(email,setEmail,"অ্যাডমিন ইমেইল",{keyboardType:"email-address",autoCapitalize:"none"})}
     {field(password,setPassword,"পাসওয়ার্ড",{secureTextEntry:true})}
     {btn(busy?"অপেক্ষা করুন...":authMode==="login"?"লগইন করুন":"অ্যাডমিন অ্যাকাউন্ট তৈরি করুন",adminAuth,true,busy)}
-    {btn(authMode==="login"?"প্রথমবার? অ্যাকাউন্ট তৈরি করুন":"আগে অ্যাকাউন্ট আছে? লগইন",()=>setAuthMode(v=>v==="login"?"signup":"login"))}
+    {btn(authMode==="login"?"প্রথমবার? অ্যাকাউন্ট তৈরি করুন":"আগে অ্যাকাউন্ট আছে? লগইন",()=>{setNotice("");setAuthMode(v=>v==="login"?"signup":"login");})}
     <Text style={s.muted}>প্রথমবার অ্যাকাউন্ট তৈরি করে ইমেইল যাচাই করুন।</Text>
    </ScrollView>:<ScrollView contentContainerStyle={{padding:14}}>
     <Text style={s.heading}>অ্যাডমিন প্যানেল</Text><Text style={s.muted}>লগইন: {session.user.email}</Text>
