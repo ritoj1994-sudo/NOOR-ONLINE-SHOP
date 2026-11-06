@@ -60,7 +60,7 @@ export default function App(){
   if(email.trim().toLowerCase()!==ADMIN_EMAIL.toLowerCase()){setNotice("অনুমতি নেই: নির্ধারিত অ্যাডমিন ইমেইল ব্যবহার করুন।");return;}
   if(password.length<6){setNotice("পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।");return;}
   setBusy(true);
-  const r=authMode==="signup"?await supabase.auth.signUp({email:ADMIN_EMAIL,password}):await supabase.auth.signInWithPassword({email:ADMIN_EMAIL,password});
+  const r=authMode==="signup"?await supabase.auth.signUp({email:ADMIN_EMAIL,password,options:{emailRedirectTo:"https://ritoj1994-sudo.github.io/NOOR-ONLINE-SHOP/"}}):await supabase.auth.signInWithPassword({email:ADMIN_EMAIL,password});
   setBusy(false);
   if(r.error){setNotice("অ্যাকাউন্ট তৈরি/লগইন হয়নি: "+err(r.error));return;}
   if(authMode==="signup"&&!r.data.session)setNotice("অ্যাকাউন্ট তৈরির অনুরোধ পাঠানো হয়েছে। ইমেইলে verification link এলে সেটি খুলুন, তারপর লগইন করুন।");
