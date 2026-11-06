@@ -47,12 +47,13 @@ export default function App(){
   if(!name.trim()||!phone.trim()||!address.trim()){Alert.alert("তথ্য প্রয়োজন","নাম, ফোন ও সম্পূর্ণ ঠিকানা লিখুন।");return;}
   if(!items.length){Alert.alert("কার্ট খালি","আগে পণ্য যোগ করুন।");return;}
   setBusy(true);
-  const {data,error}=await supabase.rpc("place_guest_order",{p_customer_name:name.trim(),p_customer_phone:phone.trim(),p_delivery_address:address.trim(),p_payment_method:payment,p_items:items.map(p=>({product_id:p.id,quantity:p.qty}))});
+  const {data,error}=await supabase.functions.invoke("place-order",{body:{customer_name:name.trim(),customer_phone:phone.trim(),delivery_address:address.trim(),payment_method:payment,items:items.map(p=>({product_id:p.id,quantity:p.qty}))}});
   setBusy(false);
-  if(error){Alert.alert("অর্ডার হয়নি",err(error));return;}
+  if(error||data?.error){Alert.alert("অর্ডার হয়নি",data?.error||err(error));return;}
+  const orderId=data?.order_id;
   setCart({});setName("");setPhone("");setAddress("");setPage("shop");
-  setNotice("অর্ডার সফল! অর্ডার নম্বর: "+data);
-  Alert.alert("অর্ডার সফল","আপনার অর্ডার নম্বর:\n"+data+"\nদোকান কর্তৃপক্ষ যোগাযোগ করবে।");
+  setNotice("অর্ডার সফল! অর্ডার নম্বর: "+orderId);
+  Alert.alert("অর্ডার সফল","আপনার অর্ডার নম্বর:\n"+orderId+"\nদোকান কর্তৃপক্ষ যোগাযোগ করবে।");
   loadShop();
  };
  const adminAuth=async()=>{
