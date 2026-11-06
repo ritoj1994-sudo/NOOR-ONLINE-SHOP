@@ -28,7 +28,7 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Export web app
-        run: npx expo export --platform web --output-dir dist --base-url /NOOR-ONLINE-SHOP
+        run: npx expo export --platform web --output-dir dist
       - name: Upload website artifact
         uses: actions/upload-pages-artifact@v3
         with:
