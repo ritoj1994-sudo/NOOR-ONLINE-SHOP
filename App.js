@@ -56,6 +56,12 @@ export default function App(){
   Alert.alert("অর্ডার সফল","আপনার অর্ডার নম্বর:\n"+orderId+"\nদোকান কর্তৃপক্ষ যোগাযোগ করবে।");
   loadShop();
  };
+ const resendConfirmation=async()=>{
+  setBusy(true);
+  const {error}=await supabase.auth.resend({type:"signup",email:ADMIN_EMAIL,options:{emailRedirectTo:"https://ritoj1994-sudo.github.io/NOOR-ONLINE-SHOP/"}});
+  setBusy(false);
+  setNotice(error?"ইমেইল আবার পাঠানো যায়নি: "+err(error):"ভেরিফিকেশন ইমেইল আবার পাঠানো হয়েছে। Gmail Inbox ও Spam দেখুন।");
+ };
  const adminAuth=async()=>{
   if(email.trim().toLowerCase()!==ADMIN_EMAIL.toLowerCase()){setNotice("অনুমতি নেই: নির্ধারিত অ্যাডমিন ইমেইল ব্যবহার করুন।");return;}
   if(password.length<6){setNotice("পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।");return;}
@@ -121,6 +127,7 @@ export default function App(){
     {field(password,setPassword,"পাসওয়ার্ড",{secureTextEntry:true})}
     {btn(busy?"অপেক্ষা করুন...":authMode==="login"?"লগইন করুন":"অ্যাডমিন অ্যাকাউন্ট তৈরি করুন",adminAuth,true,busy)}
     {btn(authMode==="login"?"প্রথমবার? অ্যাকাউন্ট তৈরি করুন":"আগে অ্যাকাউন্ট আছে? লগইন",()=>{setNotice("");setAuthMode(v=>v==="login"?"signup":"login");})}
+    {authMode==="signup"&&btn("ভেরিফিকেশন ইমেইল আবার পাঠান",resendConfirmation,false,busy)}
     <Text style={s.muted}>প্রথমবার অ্যাকাউন্ট তৈরি করে ইমেইল যাচাই করুন।</Text>
    </ScrollView>:<ScrollView contentContainerStyle={{padding:14}}>
     <Text style={s.heading}>অ্যাডমিন প্যানেল</Text><Text style={s.muted}>লগইন: {session.user.email}</Text>
