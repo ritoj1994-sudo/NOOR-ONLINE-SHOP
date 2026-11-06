@@ -23,7 +23,7 @@ jobs:
         run: npm install
 
       - name: Link or create Expo EAS project
-        run: npx --yes eas-cli@latest init --force --non-interactive --account ritoj
+        run: npx --yes eas-cli@latest init --force --non-interactive
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
