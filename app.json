@@ -13,6 +13,9 @@
     },
     "ios": {
       "bundleIdentifier": "com.noor.onlineshop"
+    },
+    "web": {
+      "bundler": "metro"
     }
   }
 }
