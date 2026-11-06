@@ -114,7 +114,7 @@ export default function App(){
   </ScrollView>}
 
   {page==="admin"&&<KeyboardAvoidingView style={{flex:1}} behavior={Platform.OS==="ios"?"padding":undefined}>
-   {!session?<ScrollView contentContainerStyle={{padding:16}}>
+   {(!session||session.user.email?.toLowerCase()!==ADMIN_EMAIL.toLowerCase())?<ScrollView contentContainerStyle={{padding:16}}>
     <Text style={s.heading}>অ্যাডমিন লগইন</Text><Text style={s.muted}>নির্ধারিত ইমেইল: {ADMIN_EMAIL}</Text>
     {field(email,setEmail,"অ্যাডমিন ইমেইল",{keyboardType:"email-address",autoCapitalize:"none"})}
     {field(password,setPassword,"পাসওয়ার্ড",{secureTextEntry:true})}
