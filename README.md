@@ -18,8 +18,10 @@ Bangla-first Expo marketplace app backed by Supabase.
 1. Install dependencies: `npm install`
 2. Start Expo: `npx expo start`
 3. Open the app in Expo Go or a development build.
-4. In Admin, create the store admin account using the configured owner email. Verify the email, then sign in.
-5. Add real products, prices, stock counts and image URLs.
+4. For an Android test APK, sign in to Expo, run `npx eas-cli@latest init`, then run `npx eas-cli@latest build --platform android --profile preview`.
+5. For a Play Store bundle, run `npx eas-cli@latest build --platform android --profile production`.
+6. In Admin, create the store admin account using the configured owner email. Verify the email, then sign in.
+7. Add real products, prices, stock counts and image URLs.
 
 ## Production requirements
 - The Supabase publishable key is designed for public clients. Never add a service-role or secret key to this repository.
