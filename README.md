@@ -1,21 +1,30 @@
 # NOOR ONLINE SHOP
 
-Bangladesh-focused multi-category marketplace starter app built with Expo / React Native.
+Bangla-first Expo marketplace app backed by Supabase.
 
-## Included
-- Bangla storefront, category filters and product search
-- Cart quantity controls and total calculation
-- Customer name, phone and delivery address
-- COD, bKash and Nagad payment choices (payment credentials are intentionally placeholders)
-- WhatsApp order handoff to 01838345812
-- Local product add/remove admin screen
-- Local persistence on the same device with AsyncStorage
+## Features
+- Public product catalogue and category filters
+- Shopping cart and guest checkout
+- Guest orders stored in Supabase with server-side price validation and stock deduction
+- Store-admin sign-up/login, product creation/hiding, order listing and status updates
+- Product image URL support
 
-## Run
-1. Install Node.js and Expo tooling on a computer.
-2. Run `npm install`
-3. Run `npx expo start`
-4. Scan the QR code using Expo Go.
+## Stack
+- Expo SDK 54 / React Native
+- Supabase Auth, Postgres and Row Level Security
+- AsyncStorage for cart and session persistence
 
-## Important before public launch
-This is a starter app, not a production marketplace. Product/admin data is stored only on the device. There is no shared cloud database, secure admin authentication, courier API, payment gateway integration, order dashboard, inventory synchronization, or production build. Do not collect real customer/payment data until these are implemented and tested. Add real bKash/Nagad merchant payment integration only through official merchant APIs and never store secret keys in the app.
+## First run
+1. Install dependencies: `npm install`
+2. Start Expo: `npx expo start`
+3. Open the app in Expo Go or a development build.
+4. In Admin, create the store admin account using the configured owner email. Verify the email, then sign in.
+5. Add real products, prices, stock counts and image URLs.
+
+## Production requirements
+- The Supabase publishable key is designed for public clients. Never add a service-role or secret key to this repository.
+- Configure Supabase Auth email confirmation and redirect URLs before production.
+- Configure EAS builds before distributing the Android app.
+- bKash/Nagad are currently selected payment methods only; a merchant gateway and server-side payment verification are still required for online payments.
+- Delivery fee is currently zero; courier integration is not configured.
+- Add verified business contact details, privacy policy and terms before public launch.
