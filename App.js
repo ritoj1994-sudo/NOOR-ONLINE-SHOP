@@ -57,10 +57,18 @@ export default function App(){
   loadShop();
  };
  const resendConfirmation=async()=>{
+  if(busy)return;
   setBusy(true);
-  const {error}=await supabase.auth.resend({type:"signup",email:ADMIN_EMAIL,options:{emailRedirectTo:"https://ritoj1994-sudo.github.io/NOOR-ONLINE-SHOP/"}});
-  setBusy(false);
-  setNotice(error?"ইমেইল আবার পাঠানো যায়নি: "+err(error):"ভেরিফিকেশন ইমেইল আবার পাঠানো হয়েছে। Gmail Inbox ও Spam দেখুন।");
+  setNotice("ভেরিফিকেশন ইমেইল পাঠানো হচ্ছে...");
+  try{
+   const {data,error}=await supabase.auth.resend({type:"signup",email:ADMIN_EMAIL,options:{emailRedirectTo:"https://ritoj1994-sudo.github.io/NOOR-ONLINE-SHOP/"}});
+   if(error)throw error;
+   setNotice("ইমেইল পাঠানোর অনুরোধ সফল হয়েছে। Gmail Inbox, Spam ও Promotions দেখুন।");
+  }catch(e){
+   setNotice("ইমেইল পাঠানো যায়নি: "+err(e));
+  }finally{
+   setBusy(false);
+  }
  };
  const adminAuth=async()=>{
   if(email.trim().toLowerCase()!==ADMIN_EMAIL.toLowerCase()){setNotice("অনুমতি নেই: নির্ধারিত অ্যাডমিন ইমেইল ব্যবহার করুন।");return;}
