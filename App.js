@@ -110,7 +110,7 @@ export default function App(){
    {field(name,setName,"আপনার নাম")}{field(phone,setPhone,"মোবাইল নম্বর",{keyboardType:"phone-pad"})}{field(address,setAddress,"সম্পূর্ণ ঠিকানা ও জেলা",{multiline:true})}
    <Text style={s.heading}>পেমেন্ট পদ্ধতি</Text>
    {[["cod","ক্যাশ অন ডেলিভারি"],["bkash","বিকাশ"],["nagad","নগদ"]].map(([v,l])=><View key={v}>{btn(l,()=>setPayment(v),payment===v)}</View>)}
-   <Text style={s.muted}>বিকাশ/নগদ নির্বাচন করলে দোকান কর্তৃপক্ষ পেমেন্টের নির্দেশনা জানাবে। অনলাইন পেমেন্ট গেটওয়ে এখনো যুক্ত হয়নি।</Text>
+   {payment!=="cod"&&<View style={{backgroundColor:"#e8f4ec",padding:12,borderRadius:8,marginVertical:8}}><Text style={s.productName}>{payment==="bkash"?"বিকাশ পেমেন্ট":"নগদ পেমেন্ট"}</Text><Text style={{fontSize:18,fontWeight:"bold",color:"#17633f",marginVertical:5}}>01838345812</Text><Text style={s.muted}>এই নম্বরে {payment==="bkash"?"বিকাশ":"নগদ"} দিয়ে পেমেন্ট করুন। অর্ডার দেওয়ার পর অর্ডার নম্বর ও পেমেন্টের Transaction ID সংরক্ষণ করে রাখুন। দোকান কর্তৃপক্ষ পেমেন্ট যাচাই করে যোগাযোগ করবে।</Text><Text style={s.muted}>এটি ম্যানুয়াল পেমেন্ট; সরাসরি অনলাইন পেমেন্ট গেটওয়ে এখনো যুক্ত হয়নি।</Text></View> }
    {btn(busy?"অর্ডার পাঠানো হচ্ছে...":"অর্ডার নিশ্চিত করুন",placeOrder,true,busy||!items.length)}
   </ScrollView>}
 
