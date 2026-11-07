@@ -1,18 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-<defs>
- <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fafff7"/><stop offset="1" stop-color="#e6f5e8"/></linearGradient>
- <linearGradient id="green" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#159447"/><stop offset="1" stop-color="#07552f"/></linearGradient>
- <linearGradient id="red" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ff5548"/><stop offset="1" stop-color="#d71920"/></linearGradient>
-</defs>
-<rect width="512" height="512" rx="112" fill="url(#bg)"/>
-<rect x="12" y="12" width="488" height="488" rx="100" fill="none" stroke="#0b7138" stroke-width="12"/>
-<path d="M112 126h38l29 147h185l42-112H170" fill="none" stroke="url(#green)" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
-<circle cx="211" cy="305" r="14" fill="#07552f"/><circle cx="350" cy="305" r="14" fill="#07552f"/>
-<path d="M205 143h86l-8 93h-86z" fill="#ed2939"/><path d="M291 156h76l-8 80h-76z" fill="#1688dc"/><path d="M207 143l18-22h54l12 22" fill="#ffbf31"/>
-<path d="M236 173h44v39h-44z" fill="none" stroke="#fff" stroke-width="7" stroke-linejoin="round"/>
-<path d="M247 183h22m-22 11h22m-22 11h22" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
-<text x="256" y="378" font-family="Arial,sans-serif" font-size="76" font-weight="900" text-anchor="middle" fill="url(#green)" letter-spacing="2">NOOR</text>
-<rect x="65" y="394" width="382" height="57" rx="18" fill="url(#red)"/>
-<text x="256" y="433" font-family="Arial,sans-serif" font-size="36" font-weight="800" text-anchor="middle" fill="#fff">ONLINE SHOP</text>
-<path d="M94 468h324" stroke="#0b7138" stroke-width="7" stroke-linecap="round"/>
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#16a34a"/><stop offset="1" stop-color="#064e3b"/></linearGradient><linearGradient id="o" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#facc15"/><stop offset="1" stop-color="#f97316"/></linearGradient></defs>
+<rect width="512" height="512" rx="112" fill="url(#g)"/>
+<rect x="24" y="24" width="464" height="464" rx="94" fill="#fff"/>
+<path d="M102 116h48l34 164h178l48-126H174" fill="none" stroke="#087443" stroke-width="23" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M188 192h201l-29 70H203z" fill="#16a34a"/>
+<path d="M215 210h22v28h-22zm48 0h22v28h-22zm48 0h22v28h-22z" fill="#fff"/>
+<circle cx="222" cy="315" r="19" fill="#064e3b"/><circle cx="350" cy="315" r="19" fill="#064e3b"/>
+<path d="M185 160h205l-13 31H191z" fill="url(#o)"/>
+<text x="256" y="405" font-family="Arial,sans-serif" font-size="76" font-weight="900" text-anchor="middle" fill="#075b36">NOOR</text>
+<rect x="85" y="423" width="342" height="43" rx="21" fill="#e51f2a"/>
+<text x="256" y="453" font-family="Arial,sans-serif" font-size="27" font-weight="800" text-anchor="middle" fill="#fff" letter-spacing="2">ONLINE SHOP</text>
 </svg>
