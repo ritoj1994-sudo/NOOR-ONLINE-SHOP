@@ -1,0 +1,20 @@
+{
+  "id": "/NOOR-ONLINE-SHOP/",
+  "name": "NOOR ONLINE SHOP",
+  "short_name": "NOOR SHOP",
+  "description": "বাংলাদেশের অনলাইন মার্কেটপ্লেস",
+  "lang": "bn",
+  "start_url": "/NOOR-ONLINE-SHOP/",
+  "scope": "/NOOR-ONLINE-SHOP/",
+  "display": "standalone",
+  "background_color": "#f6f7f8",
+  "theme_color": "#123b2b",
+  "icons": [
+    {
+      "src": "/NOOR-ONLINE-SHOP/noor-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
