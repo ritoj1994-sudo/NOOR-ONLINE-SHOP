@@ -2,6 +2,7 @@ import React, {useEffect,useMemo,useState} from "react";
 import {SafeAreaView,View,Text,TextInput,TouchableOpacity,FlatList,ScrollView,Alert,ActivityIndicator,StyleSheet,KeyboardAvoidingView,Platform,Image} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {supabase} from "./lib/supabase";
+import * as ImagePicker from "expo-image-picker";
 
 const ADMIN_EMAIL="Ritoj1994@gmail.com";
 const money=n=>"৳"+Number(n||0).toLocaleString("en-BD");
@@ -12,7 +13,7 @@ export default function App(){
  const [category,setCategory]=useState("সব"),[search,setSearch]=useState(""),[page,setPage]=useState("shop");
  const [loading,setLoading]=useState(true),[busy,setBusy]=useState(false),[notice,setNotice]=useState("");
  const [name,setName]=useState(""),[phone,setPhone]=useState(""),[address,setAddress]=useState(""),[payment,setPayment]=useState("cod");
- const [pName,setPName]=useState(""),[pPrice,setPPrice]=useState(""),[pStock,setPStock]=useState("10"),[pCategory,setPCategory]=useState(""),[pDesc,setPDesc]=useState(""),[pImage,setPImage]=useState("");
+ const [pName,setPName]=useState(""),[pPrice,setPPrice]=useState(""),[pStock,setPStock]=useState("10"),[pCategory,setPCategory]=useState(""),[pDesc,setPDesc]=useState(""),[pImage,setPImage]=useState(""),[pImageAsset,setPImageAsset]=useState(null);
  const [email,setEmail]=useState(ADMIN_EMAIL),[password,setPassword]=useState(""),[session,setSession]=useState(null),[authMode,setAuthMode]=useState("signup"),[orders,setOrders]=useState([]);
 
  const loadShop=async()=>{
@@ -80,14 +81,40 @@ export default function App(){
   if(authMode==="signup"&&!r.data.session)setNotice("অ্যাকাউন্ট তৈরির অনুরোধ পাঠানো হয়েছে। ইমেইলে verification link এলে সেটি খুলুন, তারপর লগইন করুন।");
   else {setSession(r.data.session);setNotice("অ্যাডমিন লগইন সফল হয়েছে।");}
  };
+ const chooseProductImage=async()=>{
+  const result=await ImagePicker.launchImageLibraryAsync({mediaTypes:["images"],allowsEditing:true,aspect:[1,1],quality:0.8});
+  if(!result.canceled&&result.assets?.[0])setPImageAsset(result.assets[0]);
+ };
+ const uploadProductImage=async(productId,asset)=>{
+  const response=await fetch(asset.uri);
+  const fileData=await response.arrayBuffer();
+  const mime=asset.mimeType||"image/jpeg";
+  const ext=(mime.split("/")[1]||"jpg").replace("jpeg","jpg");
+  const path=productId+"/"+Date.now()+"."+ext;
+  const {error:uploadError}=await supabase.storage.from("product-images").upload(path,fileData,{contentType:mime,upsert:true});
+  if(uploadError)throw uploadError;
+  const {data}=supabase.storage.from("product-images").getPublicUrl(path);
+  const {error:updateError}=await supabase.from("products").update({image_url:data.publicUrl}).eq("id",productId);
+  if(updateError)throw updateError;
+ };
+ const addPhotoToExistingProduct=async productId=>{
+  const result=await ImagePicker.launchImageLibraryAsync({mediaTypes:["images"],allowsEditing:true,aspect:[1,1],quality:0.8});
+  if(result.canceled||!result.assets?.[0])return;
+  setBusy(true);
+  try{await uploadProductImage(productId,result.assets[0]);Alert.alert("সফল","পণ্যের ছবি আপলোড হয়েছে।");await loadShop();}
+  catch(e){Alert.alert("ছবি আপলোড হয়নি",err(e));}
+  finally{setBusy(false);}
+ };
  const addProduct=async()=>{
   const price=Number(pPrice),stock=Number(pStock);
   if(!pName.trim()||!Number.isFinite(price)||price<=0||!Number.isInteger(stock)||stock<0||!pCategory){Alert.alert("সঠিক তথ্য দিন","পণ্যের নাম, দাম, স্টক ও ক্যাটাগরি দিন।");return;}
   setBusy(true);
-  const {error}=await supabase.from("products").insert({name:pName.trim(),description:pDesc.trim(),price,stock_quantity:stock,category_id:pCategory,image_url:pImage.trim()||null,is_active:true});
+  const {data:created,error}=await supabase.from("products").insert({name:pName.trim(),description:pDesc.trim(),price,stock_quantity:stock,category_id:pCategory,image_url:pImage.trim()||null,is_active:true}).select("id").single();
+  if(error){setBusy(false);Alert.alert("পণ্য যোগ হয়নি",err(error));return;}
+  let photoMessage="";
+  if(pImageAsset){try{await uploadProductImage(created.id,pImageAsset);}catch(e){photoMessage=" পণ্য যোগ হয়েছে, তবে ছবি আপলোড হয়নি: "+err(e);}}
   setBusy(false);
-  if(error){Alert.alert("পণ্য যোগ হয়নি",err(error));return;}
-  setPName("");setPPrice("");setPStock("10");setPDesc("");setPImage("");Alert.alert("সফল","পণ্য অনলাইন শপে যুক্ত হয়েছে।");loadShop();
+  setPName("");setPPrice("");setPStock("10");setPDesc("");setPImage("");setPImageAsset(null);Alert.alert("সফল","পণ্য অনলাইন শপে যুক্ত হয়েছে।"+photoMessage);loadShop();
  };
  const hideProduct=async id=>{const {error}=await supabase.from("products").update({is_active:false}).eq("id",id);if(error)Alert.alert("সমস্যা",err(error));else loadShop();};
  const loadOrders=async()=>{
@@ -141,11 +168,11 @@ export default function App(){
     <Text style={s.heading}>অ্যাডমিন প্যানেল</Text><Text style={s.muted}>লগইন: {session.user.email}</Text>
     <View style={s.row}>{btn("অর্ডার দেখুন",loadOrders)}{btn("লগআউট",async()=>{await supabase.auth.signOut();setSession(null);setOrders([]);})}</View>
     <Text style={s.heading}>নতুন পণ্য যোগ করুন</Text>
-    {field(pName,setPName,"পণ্যের নাম")}{field(pPrice,setPPrice,"দাম (টাকা)",{keyboardType:"decimal-pad"})}{field(pStock,setPStock,"স্টক সংখ্যা",{keyboardType:"number-pad"})}{field(pDesc,setPDesc,"পণ্যের বিবরণ",{multiline:true})}{field(pImage,setPImage,"ছবির URL (ঐচ্ছিক)",{keyboardType:"url",autoCapitalize:"none"})}
+    {field(pName,setPName,"পণ্যের নাম")}{field(pPrice,setPPrice,"দাম (টাকা)",{keyboardType:"decimal-pad"})}{field(pStock,setPStock,"স্টক সংখ্যা",{keyboardType:"number-pad"})}{field(pDesc,setPDesc,"পণ্যের বিবরণ",{multiline:true})}{btn(pImageAsset?"ছবি নির্বাচিত: "+pImageAsset.fileName:"মোবাইল থেকে পণ্যের ছবি নির্বাচন করুন",chooseProductImage)}{pImageAsset&&btn("ছবি বাদ দিন",()=>setPImageAsset(null))}{field(pImage,setPImage,"অথবা ছবির URL দিন (ঐচ্ছিক)",{keyboardType:"url",autoCapitalize:"none"})}
     <Text style={s.muted}>ক্যাটাগরি নির্বাচন করুন</Text><ScrollView horizontal>{categories.map(c=><View key={c.id} style={{marginRight:5}}>{btn(c.name,()=>setPCategory(c.id),pCategory===c.id)}</View>)}</ScrollView>
     {btn(busy?"সংরক্ষণ হচ্ছে...":"অনলাইনে পণ্য যোগ করুন",addProduct,true,busy)}
     <Text style={s.heading}>পণ্য তালিকা ({products.length})</Text>
-    {products.map(p=><View key={p.id} style={s.cartRow}><View style={{flex:1}}><Text style={s.productName}>{p.name}</Text><Text>{money(p.price)} · স্টক {p.stock_quantity}</Text></View>{btn("লুকান",()=>hideProduct(p.id))}</View>)}
+    {products.map(p=><View key={p.id} style={s.cartRow}>{p.image_url&&<Image source={{uri:p.image_url}} style={s.productImage}/>}<View style={{flex:1}}><Text style={s.productName}>{p.name}</Text><Text>{money(p.price)} · স্টক {p.stock_quantity}</Text></View>{btn("ছবি যোগ",()=>addPhotoToExistingProduct(p.id),false,busy)}{btn("লুকান",()=>hideProduct(p.id))}</View>)}
     <Text style={s.heading}>অর্ডার তালিকা ({orders.length})</Text>
     {orders.map(o=><View key={o.id} style={s.orderCard}><Text style={s.productName}>অর্ডার: {o.id.slice(0,8)}</Text><Text>{o.customer_name} · {o.customer_phone}</Text><Text>{o.delivery_address}</Text><Text>মোট: {money(o.total)} · {statusLabel(o.order_status)}</Text>
      {(o.order_items||[]).map((it,i)=><Text key={i} style={s.muted}>• {it.product_name} × {it.quantity}</Text>)}
