@@ -11,7 +11,11 @@
     },
     "android": {
       "package": "com.noor.onlineshop",
-      "icon": "./assets/noor-icon.png"
+      "icon": "./assets/noor-icon.png",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/noor-icon.png",
+        "backgroundColor": "#ffffff"
+      }
     },
     "ios": {
       "bundleIdentifier": "com.noor.onlineshop"
