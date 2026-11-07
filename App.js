@@ -16,6 +16,7 @@ export default function App(){
  const [pName,setPName]=useState(""),[pPrice,setPPrice]=useState(""),[pStock,setPStock]=useState("10"),[pCategory,setPCategory]=useState(""),[pDesc,setPDesc]=useState(""),[pImage,setPImage]=useState(""),[pImageAsset,setPImageAsset]=useState(null);
  const [email,setEmail]=useState(ADMIN_EMAIL),[password,setPassword]=useState(""),[session,setSession]=useState(null),[authMode,setAuthMode]=useState("signup"),[orders,setOrders]=useState([]);
  const [editProductId,setEditProductId]=useState(""),[editProductName,setEditProductName]=useState(""),[editProductPrice,setEditProductPrice]=useState(""),[editProductStock,setEditProductStock]=useState(""),[editProductDesc,setEditProductDesc]=useState("");
+ const [trackId,setTrackId]=useState(""),[trackPhone,setTrackPhone]=useState(""),[trackedOrder,setTrackedOrder]=useState(null),[trackBusy,setTrackBusy]=useState(false);
 
  const loadShop=async()=>{
   setLoading(true);
@@ -141,13 +142,21 @@ export default function App(){
   const {error}=await supabase.from("orders").update({order_status:status}).eq("id",id);
   if(error)Alert.alert("আপডেট হয়নি",err(error));else setOrders(a=>a.map(o=>o.id===id?{...o,order_status:status}:o));
  };
+ const lookupOrder=async()=>{
+  if(!trackId.trim()||!trackPhone.trim()){Alert.alert("তথ্য প্রয়োজন","অর্ডার নম্বর ও অর্ডারের সময় দেওয়া ফোন নম্বর লিখুন।");return;}
+  setTrackBusy(true);setTrackedOrder(null);
+  const {data,error}=await supabase.functions.invoke("lookup-order",{body:{order_id:trackId.trim(),customer_phone:trackPhone.trim()}});
+  setTrackBusy(false);
+  if(error||data?.error){let message=data?.error||err(error);try{const body=await error?.context?.json?.();if(body?.error)message=body.error;}catch{}Alert.alert("অর্ডার পাওয়া যায়নি",message);return;}
+  setTrackedOrder(data?.order||null);
+ };
  const btn=(label,fn,active=false,disabled=false)=><TouchableOpacity onPress={fn} disabled={disabled} style={[s.btn,active&&s.active,disabled&&{opacity:.45}]}><Text style={[s.btnText,active&&{color:"#fff"}]}>{label}</Text></TouchableOpacity>;
  const field=(v,fn,ph,extra={})=><TextInput style={s.input} value={v} onChangeText={fn} placeholder={ph} placeholderTextColor="#7b887f" {...extra}/>;
  const statusLabel=v=>({pending:"নতুন",confirmed:"নিশ্চিত",processing:"প্রস্তুত হচ্ছে",shipped:"পাঠানো হয়েছে",delivered:"সম্পন্ন",cancelled:"বাতিল"}[v]||v);
 
  return <SafeAreaView style={s.safe}>
   <View style={s.header}><Text style={s.logo}>NOOR ONLINE SHOP</Text><Text style={s.sub}>বাংলাদেশের অনলাইন মার্কেটপ্লেস</Text></View>
-  <View style={s.nav}>{btn("শপ",()=>setPage("shop"),page==="shop")}{btn("কার্ট ("+count+")",()=>setPage("cart"),page==="cart")}{btn("অ্যাডমিন",()=>setPage("admin"),page==="admin")}</View>
+  <View style={s.nav}>{btn("শপ",()=>setPage("shop"),page==="shop")}{btn("কার্ট ("+count+")",()=>setPage("cart"),page==="cart")}{btn("অর্ডার ট্র্যাক",()=>setPage("track"),page==="track")}{btn("অ্যাডমিন",()=>setPage("admin"),page==="admin")}</View>
   {!!notice&&<TouchableOpacity style={s.notice} onPress={()=>setNotice("")}><Text style={s.noticeText}>{notice} ×</Text></TouchableOpacity>}
 
   {page==="shop"&&<View style={{flex:1}}>
@@ -170,6 +179,24 @@ export default function App(){
    {btn(busy?"অর্ডার পাঠানো হচ্ছে...":"অর্ডার নিশ্চিত করুন",placeOrder,true,busy||!items.length)}
   </ScrollView>}
 
+  {page==="track"&&<ScrollView contentContainerStyle={{padding:16}}>
+   <Text style={s.heading}>আপনার অর্ডার খুঁজুন</Text>
+   <Text style={s.muted}>অর্ডার করার পর পাওয়া সম্পূর্ণ অর্ডার নম্বর এবং অর্ডারের সময় দেওয়া ফোন নম্বর লিখুন।</Text>
+   {field(trackId,setTrackId,"অর্ডার নম্বর (সম্পূর্ণ)",{autoCapitalize:"none"})}
+   {field(trackPhone,setTrackPhone,"অর্ডারের ফোন নম্বর",{keyboardType:"phone-pad"})}
+   {btn(trackBusy?"খোঁজা হচ্ছে...":"অর্ডারের অবস্থা দেখুন",lookupOrder,true,trackBusy)}
+   {!!trackedOrder&&<View style={s.orderCard}>
+    <Text style={s.heading}>অর্ডারের তথ্য</Text>
+    <Text style={s.productName}>অর্ডার: {trackedOrder.id}</Text>
+    <Text>গ্রাহক: {trackedOrder.customer_name}</Text>
+    <Text>অর্ডার অবস্থা: {({pending:"নতুন অর্ডার",confirmed:"নিশ্চিত",processing:"প্রস্তুত হচ্ছে",shipped:"পাঠানো হয়েছে",delivered:"ডেলিভারি সম্পন্ন",cancelled:"বাতিল"}[trackedOrder.order_status]||trackedOrder.order_status)}</Text>
+    <Text>পেমেন্ট: {({cod:"ক্যাশ অন ডেলিভারি",bkash:"বিকাশ",nagad:"নগদ"}[trackedOrder.payment_method]||trackedOrder.payment_method)} · {({pending:"অপেক্ষমাণ",paid:"পরিশোধিত",failed:"ব্যর্থ",refunded:"ফেরত"}[trackedOrder.payment_status]||trackedOrder.payment_status)}</Text>
+    <Text style={s.heading}>পণ্যের তালিকা</Text>
+    {(trackedOrder.order_items||[]).map((it,i)=><Text key={i} style={s.muted}>{it.product_name} × {it.quantity} — {money(it.line_total)}</Text>)}
+    <Text style={s.total}>মোট: {money(trackedOrder.total)}</Text>
+    <Text style={s.muted}>অর্ডারের তারিখ: {new Date(trackedOrder.created_at).toLocaleString("bn-BD")}</Text>
+   </View>}
+  </ScrollView>}
   {page==="admin"&&<KeyboardAvoidingView style={{flex:1}} behavior={Platform.OS==="ios"?"padding":undefined}>
    {(!session||session.user.email?.toLowerCase()!==ADMIN_EMAIL.toLowerCase())?<ScrollView contentContainerStyle={{padding:16}}>
     <Text style={s.heading}>{authMode==="signup"?"প্রথমবার অ্যাডমিন অ্যাকাউন্ট তৈরি করুন":"অ্যাডমিন লগইন"}</Text><Text style={s.muted}>নির্ধারিত ইমেইল: {ADMIN_EMAIL}</Text><Text style={{color:"#17633f",fontWeight:"bold",marginVertical:8}}>{authMode==="signup"?"নতুন অ্যাকাউন্ট তৈরি করার মোড চালু আছে।":"আগের অ্যাকাউন্ট দিয়ে লগইন করুন।"}</Text>
