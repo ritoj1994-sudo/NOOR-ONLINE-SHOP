@@ -192,6 +192,7 @@ export default function App(){
     <Text>গ্রাহক: {trackedOrder.customer_name}</Text>
     <Text>অর্ডার অবস্থা: {({pending:"নতুন অর্ডার",confirmed:"নিশ্চিত",processing:"প্রস্তুত হচ্ছে",shipped:"পাঠানো হয়েছে",delivered:"ডেলিভারি সম্পন্ন",cancelled:"বাতিল"}[trackedOrder.order_status]||trackedOrder.order_status)}</Text>
     <Text>পেমেন্ট: {({cod:"ক্যাশ অন ডেলিভারি",bkash:"বিকাশ",nagad:"নগদ"}[trackedOrder.payment_method]||trackedOrder.payment_method)} · {({pending:"অপেক্ষমাণ",paid:"পরিশোধিত",failed:"ব্যর্থ",refunded:"ফেরত"}[trackedOrder.payment_status]||trackedOrder.payment_status)}</Text>
+    {!!trackedOrder.payment_reference&&<Text>Transaction ID: {trackedOrder.payment_reference}</Text>}
     <Text style={s.heading}>পণ্যের তালিকা</Text>
     {(trackedOrder.order_items||[]).map((it,i)=><Text key={i} style={s.muted}>{it.product_name} × {it.quantity} — {money(it.line_total)}</Text>)}
     <Text style={s.total}>মোট: {money(trackedOrder.total)}</Text>
