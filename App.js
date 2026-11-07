@@ -12,7 +12,7 @@ export default function App(){
  const [products,setProducts]=useState([]),[categories,setCategories]=useState([]),[cart,setCart]=useState({});
  const [category,setCategory]=useState("সব"),[search,setSearch]=useState(""),[page,setPage]=useState("shop");
  const [loading,setLoading]=useState(true),[busy,setBusy]=useState(false),[notice,setNotice]=useState("");
- const [name,setName]=useState(""),[phone,setPhone]=useState(""),[address,setAddress]=useState(""),[payment,setPayment]=useState("cod");
+ const [name,setName]=useState(""),[phone,setPhone]=useState(""),[address,setAddress]=useState(""),[payment,setPayment]=useState("cod"),[paymentReference,setPaymentReference]=useState("");
  const [pName,setPName]=useState(""),[pPrice,setPPrice]=useState(""),[pStock,setPStock]=useState("10"),[pCategory,setPCategory]=useState(""),[pDesc,setPDesc]=useState(""),[pImage,setPImage]=useState(""),[pImageAsset,setPImageAsset]=useState(null);
  const [email,setEmail]=useState(ADMIN_EMAIL),[password,setPassword]=useState(""),[session,setSession]=useState(null),[authMode,setAuthMode]=useState("signup"),[orders,setOrders]=useState([]);
  const [editProductId,setEditProductId]=useState(""),[editProductName,setEditProductName]=useState(""),[editProductPrice,setEditProductPrice]=useState(""),[editProductStock,setEditProductStock]=useState(""),[editProductDesc,setEditProductDesc]=useState("");
@@ -49,12 +49,13 @@ export default function App(){
  const placeOrder=async()=>{
   if(!name.trim()||!phone.trim()||!address.trim()){Alert.alert("তথ্য প্রয়োজন","নাম, ফোন ও সম্পূর্ণ ঠিকানা লিখুন।");return;}
   if(!items.length){Alert.alert("কার্ট খালি","আগে পণ্য যোগ করুন।");return;}
+  if(payment!=="cod"&&!paymentReference.trim()){Alert.alert("Transaction ID প্রয়োজন","বিকাশ/নগদ পেমেন্টের Transaction ID লিখুন।");return;}
   setBusy(true);
-  const {data,error}=await supabase.functions.invoke("place-order",{body:{customer_name:name.trim(),customer_phone:phone.trim(),delivery_address:address.trim(),payment_method:payment,items:items.map(p=>({product_id:p.id,quantity:p.qty}))}});
+  const {data,error}=await supabase.functions.invoke("place-order",{body:{customer_name:name.trim(),customer_phone:phone.trim(),delivery_address:address.trim(),payment_method:payment,payment_reference:paymentReference.trim(),items:items.map(p=>({product_id:p.id,quantity:p.qty}))}});
   setBusy(false);
   if(error||data?.error){Alert.alert("অর্ডার হয়নি",data?.error||err(error));return;}
   const orderId=data?.order_id;
-  setCart({});setName("");setPhone("");setAddress("");setPage("shop");
+  setCart({});setName("");setPhone("");setAddress("");setPaymentReference("");setPage("shop");
   setNotice("অর্ডার সফল! অর্ডার নম্বর: "+orderId);
   Alert.alert("অর্ডার সফল","আপনার অর্ডার নম্বর:\n"+orderId+"\nদোকান কর্তৃপক্ষ যোগাযোগ করবে।");
   loadShop();
@@ -131,7 +132,7 @@ export default function App(){
  const hideProduct=async id=>{const {error}=await supabase.from("products").update({is_active:false}).eq("id",id);if(error)Alert.alert("সমস্যা",err(error));else loadShop();};
  const loadOrders=async()=>{
   setBusy(true);
-  const {data,error}=await supabase.from("orders").select("id,customer_name,customer_phone,delivery_address,payment_method,payment_status,order_status,total,created_at,order_items(product_name,quantity)").order("created_at",{ascending:false}).limit(100);
+  const {data,error}=await supabase.from("orders").select("id,customer_name,customer_phone,delivery_address,payment_method,payment_reference,payment_status,order_status,total,created_at,order_items(product_name,quantity)").order("created_at",{ascending:false}).limit(100);
   setBusy(false);if(error)Alert.alert("অর্ডার লোড হয়নি",err(error));else setOrders(data||[]);
  };
  const updatePaymentStatus=async(id,status)=>{
@@ -175,7 +176,7 @@ export default function App(){
    {field(name,setName,"আপনার নাম")}{field(phone,setPhone,"মোবাইল নম্বর",{keyboardType:"phone-pad"})}{field(address,setAddress,"সম্পূর্ণ ঠিকানা ও জেলা",{multiline:true})}
    <Text style={s.heading}>পেমেন্ট পদ্ধতি</Text>
    {[["cod","ক্যাশ অন ডেলিভারি"],["bkash","বিকাশ"],["nagad","নগদ"]].map(([v,l])=><View key={v}>{btn(l,()=>setPayment(v),payment===v)}</View>)}
-   {payment!=="cod"&&<View style={{backgroundColor:"#e8f4ec",padding:12,borderRadius:8,marginVertical:8}}><Text style={s.productName}>{payment==="bkash"?"বিকাশ পেমেন্ট":"নগদ পেমেন্ট"}</Text><Text style={{fontSize:18,fontWeight:"bold",color:"#17633f",marginVertical:5}}>01838345812</Text><Text style={s.muted}>এই নম্বরে {payment==="bkash"?"বিকাশ":"নগদ"} দিয়ে পেমেন্ট করুন। অর্ডার দেওয়ার পর অর্ডার নম্বর ও পেমেন্টের Transaction ID সংরক্ষণ করে রাখুন। দোকান কর্তৃপক্ষ পেমেন্ট যাচাই করে যোগাযোগ করবে।</Text><Text style={s.muted}>এটি ম্যানুয়াল পেমেন্ট; সরাসরি অনলাইন পেমেন্ট গেটওয়ে এখনো যুক্ত হয়নি।</Text></View> }
+   {payment!=="cod"&&<View style={{backgroundColor:"#e8f4ec",padding:12,borderRadius:8,marginVertical:8}}><Text style={s.productName}>{payment==="bkash"?"বিকাশ পেমেন্ট":"নগদ পেমেন্ট"}</Text><Text style={{fontSize:18,fontWeight:"bold",color:"#17633f",marginVertical:5}}>01838345812</Text><Text style={s.muted}>এই নম্বরে {payment==="bkash"?"বিকাশ":"নগদ"} দিয়ে পেমেন্ট করুন। অর্ডার দেওয়ার পর অর্ডার নম্বর ও পেমেন্টের Transaction ID সংরক্ষণ করে রাখুন। দোকান কর্তৃপক্ষ পেমেন্ট যাচাই করে যোগাযোগ করবে।</Text><Text style={s.muted}>এটি ম্যানুয়াল পেমেন্ট; সরাসরি অনলাইন পেমেন্ট গেটওয়ে এখনো যুক্ত হয়নি।</Text>{field(paymentReference,setPaymentReference,"Transaction ID লিখুন",{autoCapitalize:"characters"})}</View> }
    {btn(busy?"অর্ডার পাঠানো হচ্ছে...":"অর্ডার নিশ্চিত করুন",placeOrder,true,busy||!items.length)}
   </ScrollView>}
 
@@ -217,7 +218,7 @@ export default function App(){
     {products.map(p=><View key={p.id} style={s.cartRow}>{p.image_url&&<Image source={{uri:p.image_url}} style={s.productImage}/>}<View style={{flex:1}}><Text style={s.productName}>{p.name}</Text><Text>{money(p.price)} · স্টক {p.stock_quantity}</Text></View>{btn("এডিট",()=>startEditProduct(p))}{btn("ছবি যোগ",()=>addPhotoToExistingProduct(p.id),false,busy)}{btn("লুকান",()=>hideProduct(p.id))}</View>)}
     {!!editProductId&&<View style={s.orderCard}><Text style={s.heading}>পণ্যের তথ্য পরিবর্তন</Text>{field(editProductName,setEditProductName,"পণ্যের নাম")}{field(editProductPrice,setEditProductPrice,"দাম (টাকা)",{keyboardType:"decimal-pad"})}{field(editProductStock,setEditProductStock,"স্টক সংখ্যা",{keyboardType:"number-pad"})}{field(editProductDesc,setEditProductDesc,"বিবরণ",{multiline:true})}{btn(busy?"সংরক্ষণ হচ্ছে...":"পরিবর্তন সংরক্ষণ করুন",saveProductEdits,true,busy)}{btn("বাতিল",()=>setEditProductId(""))}</View>}
     <Text style={s.heading}>অর্ডার তালিকা ({orders.length})</Text>
-    {orders.map(o=><View key={o.id} style={s.orderCard}><Text style={s.productName}>অর্ডার: {o.id.slice(0,8)}</Text><Text>{o.customer_name} · {o.customer_phone}</Text><Text>{o.delivery_address}</Text><Text>মোট: {money(o.total)} · অর্ডার: {statusLabel(o.order_status)}</Text><Text>পেমেন্ট: {({cod:"ক্যাশ অন ডেলিভারি",bkash:"বিকাশ",nagad:"নগদ"}[o.payment_method]||o.payment_method)} · পেমেন্ট অবস্থা: {({pending:"অপেক্ষমাণ",paid:"পরিশোধিত",failed:"ব্যর্থ",refunded:"ফেরত"}[o.payment_status]||o.payment_status)}</Text><ScrollView horizontal>{[["pending","অপেক্ষমাণ"],["paid","টাকা পেয়েছি"],["failed","ব্যর্থ"],["refunded","ফেরত"]].map(([v,l])=><View key={v} style={{marginRight:4}}>{btn(l,()=>updatePaymentStatus(o.id,v),o.payment_status===v)}</View>)}</ScrollView>
+    {orders.map(o=><View key={o.id} style={s.orderCard}><Text style={s.productName}>অর্ডার: {o.id.slice(0,8)}</Text><Text>{o.customer_name} · {o.customer_phone}</Text><Text>{o.delivery_address}</Text><Text>মোট: {money(o.total)} · অর্ডার: {statusLabel(o.order_status)}</Text><Text>পেমেন্ট: {({cod:"ক্যাশ অন ডেলিভারি",bkash:"বিকাশ",nagad:"নগদ"}[o.payment_method]||o.payment_method)} · Transaction ID: {o.payment_reference||"নেই"} · পেমেন্ট অবস্থা: {({pending:"অপেক্ষমাণ",paid:"পরিশোধিত",failed:"ব্যর্থ",refunded:"ফেরত"}[o.payment_status]||o.payment_status)}</Text><ScrollView horizontal>{[["pending","অপেক্ষমাণ"],["paid","টাকা পেয়েছি"],["failed","ব্যর্থ"],["refunded","ফেরত"]].map(([v,l])=><View key={v} style={{marginRight:4}}>{btn(l,()=>updatePaymentStatus(o.id,v),o.payment_status===v)}</View>)}</ScrollView>
      {(o.order_items||[]).map((it,i)=><Text key={i} style={s.muted}>• {it.product_name} × {it.quantity}</Text>)}
      <ScrollView horizontal>{[["pending","নতুন"],["confirmed","নিশ্চিত"],["processing","প্রস্তুত"],["shipped","পাঠানো"],["delivered","সম্পন্ন"],["cancelled","বাতিল"]].map(([v,l])=><View key={v} style={{marginRight:4}}>{btn(l,()=>updateStatus(o.id,v),o.order_status===v)}</View>)}</ScrollView>
     </View>)}
