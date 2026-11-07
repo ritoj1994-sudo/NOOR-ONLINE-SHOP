@@ -1,0 +1,30 @@
+name: Build NOOR ONLINE SHOP for Google Play (AAB)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-android-aab:
+    name: Build signed Android App Bundle
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Link Expo EAS project
+        run: npx --yes eas-cli@latest init --force --non-interactive
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Build production Android App Bundle
+        run: npx --yes eas-cli@latest build --platform android --profile production --non-interactive
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
