@@ -15,6 +15,7 @@ export default function App(){
  const [name,setName]=useState(""),[phone,setPhone]=useState(""),[address,setAddress]=useState(""),[payment,setPayment]=useState("cod");
  const [pName,setPName]=useState(""),[pPrice,setPPrice]=useState(""),[pStock,setPStock]=useState("10"),[pCategory,setPCategory]=useState(""),[pDesc,setPDesc]=useState(""),[pImage,setPImage]=useState(""),[pImageAsset,setPImageAsset]=useState(null);
  const [email,setEmail]=useState(ADMIN_EMAIL),[password,setPassword]=useState(""),[session,setSession]=useState(null),[authMode,setAuthMode]=useState("signup"),[orders,setOrders]=useState([]);
+ const [editProductId,setEditProductId]=useState(""),[editProductName,setEditProductName]=useState(""),[editProductPrice,setEditProductPrice]=useState(""),[editProductStock,setEditProductStock]=useState(""),[editProductDesc,setEditProductDesc]=useState("");
 
  const loadShop=async()=>{
   setLoading(true);
@@ -116,11 +117,25 @@ export default function App(){
   setBusy(false);
   setPName("");setPPrice("");setPStock("10");setPDesc("");setPImage("");setPImageAsset(null);Alert.alert("সফল","পণ্য অনলাইন শপে যুক্ত হয়েছে।"+photoMessage);loadShop();
  };
+ const startEditProduct=p=>{setEditProductId(p.id);setEditProductName(p.name||"");setEditProductPrice(String(p.price??""));setEditProductStock(String(p.stock_quantity??""));setEditProductDesc(p.description||"");};
+ const saveProductEdits=async()=>{
+  const price=Number(editProductPrice),stock=Number(editProductStock);
+  if(!editProductName.trim()||!Number.isFinite(price)||price<=0||!Number.isInteger(stock)||stock<0){Alert.alert("সঠিক তথ্য দিন","নাম, সঠিক দাম ও ০ বা তার বেশি পূর্ণসংখ্যার স্টক লিখুন।");return;}
+  setBusy(true);
+  const {error}=await supabase.from("products").update({name:editProductName.trim(),price,stock_quantity:stock,description:editProductDesc.trim()}).eq("id",editProductId);
+  setBusy(false);
+  if(error){Alert.alert("আপডেট হয়নি",err(error));return;}
+  setEditProductId("");Alert.alert("সফল","পণ্যের তথ্য আপডেট হয়েছে।");await loadShop();
+ };
  const hideProduct=async id=>{const {error}=await supabase.from("products").update({is_active:false}).eq("id",id);if(error)Alert.alert("সমস্যা",err(error));else loadShop();};
  const loadOrders=async()=>{
   setBusy(true);
-  const {data,error}=await supabase.from("orders").select("id,customer_name,customer_phone,delivery_address,payment_method,order_status,total,created_at,order_items(product_name,quantity)").order("created_at",{ascending:false}).limit(100);
+  const {data,error}=await supabase.from("orders").select("id,customer_name,customer_phone,delivery_address,payment_method,payment_status,order_status,total,created_at,order_items(product_name,quantity)").order("created_at",{ascending:false}).limit(100);
   setBusy(false);if(error)Alert.alert("অর্ডার লোড হয়নি",err(error));else setOrders(data||[]);
+ };
+ const updatePaymentStatus=async(id,status)=>{
+  const {error}=await supabase.from("orders").update({payment_status:status}).eq("id",id);
+  if(error)Alert.alert("পেমেন্ট স্ট্যাটাস আপডেট হয়নি",err(error));else setOrders(a=>a.map(o=>o.id===id?{...o,payment_status:status}:o));
  };
  const updateStatus=async(id,status)=>{
   const {error}=await supabase.from("orders").update({order_status:status}).eq("id",id);
@@ -172,9 +187,10 @@ export default function App(){
     <Text style={s.muted}>ক্যাটাগরি নির্বাচন করুন</Text><ScrollView horizontal>{categories.map(c=><View key={c.id} style={{marginRight:5}}>{btn(c.name,()=>setPCategory(c.id),pCategory===c.id)}</View>)}</ScrollView>
     {btn(busy?"সংরক্ষণ হচ্ছে...":"অনলাইনে পণ্য যোগ করুন",addProduct,true,busy)}
     <Text style={s.heading}>পণ্য তালিকা ({products.length})</Text>
-    {products.map(p=><View key={p.id} style={s.cartRow}>{p.image_url&&<Image source={{uri:p.image_url}} style={s.productImage}/>}<View style={{flex:1}}><Text style={s.productName}>{p.name}</Text><Text>{money(p.price)} · স্টক {p.stock_quantity}</Text></View>{btn("ছবি যোগ",()=>addPhotoToExistingProduct(p.id),false,busy)}{btn("লুকান",()=>hideProduct(p.id))}</View>)}
+    {products.map(p=><View key={p.id} style={s.cartRow}>{p.image_url&&<Image source={{uri:p.image_url}} style={s.productImage}/>}<View style={{flex:1}}><Text style={s.productName}>{p.name}</Text><Text>{money(p.price)} · স্টক {p.stock_quantity}</Text></View>{btn("এডিট",()=>startEditProduct(p))}{btn("ছবি যোগ",()=>addPhotoToExistingProduct(p.id),false,busy)}{btn("লুকান",()=>hideProduct(p.id))}</View>)}
+    {!!editProductId&&<View style={s.orderCard}><Text style={s.heading}>পণ্যের তথ্য পরিবর্তন</Text>{field(editProductName,setEditProductName,"পণ্যের নাম")}{field(editProductPrice,setEditProductPrice,"দাম (টাকা)",{keyboardType:"decimal-pad"})}{field(editProductStock,setEditProductStock,"স্টক সংখ্যা",{keyboardType:"number-pad"})}{field(editProductDesc,setEditProductDesc,"বিবরণ",{multiline:true})}{btn(busy?"সংরক্ষণ হচ্ছে...":"পরিবর্তন সংরক্ষণ করুন",saveProductEdits,true,busy)}{btn("বাতিল",()=>setEditProductId(""))}</View>}
     <Text style={s.heading}>অর্ডার তালিকা ({orders.length})</Text>
-    {orders.map(o=><View key={o.id} style={s.orderCard}><Text style={s.productName}>অর্ডার: {o.id.slice(0,8)}</Text><Text>{o.customer_name} · {o.customer_phone}</Text><Text>{o.delivery_address}</Text><Text>মোট: {money(o.total)} · {statusLabel(o.order_status)}</Text>
+    {orders.map(o=><View key={o.id} style={s.orderCard}><Text style={s.productName}>অর্ডার: {o.id.slice(0,8)}</Text><Text>{o.customer_name} · {o.customer_phone}</Text><Text>{o.delivery_address}</Text><Text>মোট: {money(o.total)} · অর্ডার: {statusLabel(o.order_status)}</Text><Text>পেমেন্ট: {({cod:"ক্যাশ অন ডেলিভারি",bkash:"বিকাশ",nagad:"নগদ"}[o.payment_method]||o.payment_method)} · পেমেন্ট অবস্থা: {({pending:"অপেক্ষমাণ",paid:"পরিশোধিত",failed:"ব্যর্থ",refunded:"ফেরত"}[o.payment_status]||o.payment_status)}</Text><ScrollView horizontal>{[["pending","অপেক্ষমাণ"],["paid","টাকা পেয়েছি"],["failed","ব্যর্থ"],["refunded","ফেরত"]].map(([v,l])=><View key={v} style={{marginRight:4}}>{btn(l,()=>updatePaymentStatus(o.id,v),o.payment_status===v)}</View>)}</ScrollView>
      {(o.order_items||[]).map((it,i)=><Text key={i} style={s.muted}>• {it.product_name} × {it.quantity}</Text>)}
      <ScrollView horizontal>{[["pending","নতুন"],["confirmed","নিশ্চিত"],["processing","প্রস্তুত"],["shipped","পাঠানো"],["delivered","সম্পন্ন"],["cancelled","বাতিল"]].map(([v,l])=><View key={v} style={{marginRight:4}}>{btn(l,()=>updateStatus(o.id,v),o.order_status===v)}</View>)}</ScrollView>
     </View>)}
