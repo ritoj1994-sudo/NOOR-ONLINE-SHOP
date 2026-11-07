@@ -2,6 +2,7 @@ name: Generate NOOR Android icon
 on:
   push:
     paths:
+      - "app.json"
       - "public/noor-icon.svg"
       - ".github/workflows/generate-app-icon.yml"
   workflow_dispatch:
