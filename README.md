@@ -6,8 +6,9 @@ Bangla-first Expo marketplace app backed by Supabase.
 - Public product catalogue and category filters
 - Shopping cart and guest checkout
 - Guest orders stored in Supabase with server-side price validation and stock deduction
+- Customer order tracking by order number + checkout phone, with IP-based request throttling
 - Store-admin sign-up/login, product creation/hiding, order listing and status updates
-- Product image URL support
+- Product image upload from the device or image URL support
 
 ## Stack
 - Expo SDK 54 / React Native
@@ -27,6 +28,6 @@ Bangla-first Expo marketplace app backed by Supabase.
 - The Supabase publishable key is designed for public clients. Never add a service-role or secret key to this repository.
 - Configure Supabase Auth email confirmation and redirect URLs before production.
 - Configure EAS builds before distributing the Android app.
-- bKash/Nagad are currently selected payment methods only; a merchant gateway and server-side payment verification are still required for online payments.
+- bKash/Nagad are currently manual payment methods only; a merchant gateway and server-side payment verification are still required for online payments.
 - Delivery fee is currently zero; courier integration is not configured.
 - Add verified business contact details, privacy policy and terms before public launch.
