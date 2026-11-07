@@ -24,12 +24,13 @@ Deno.serve(async (req: Request) => {
     const client = createClient(supabaseUrl, serviceKey, {
       auth: { persistSession: false, autoRefreshToken: false }
     });
-    const { data, error } = await client.rpc("place_guest_order", {
+    const { data, error } = await client.rpc("place_guest_order_with_reference", {
       p_customer_name: payload?.customer_name,
       p_customer_phone: payload?.customer_phone,
       p_delivery_address: payload?.delivery_address,
       p_payment_method: payload?.payment_method,
-      p_items: payload?.items
+      p_items: payload?.items,
+      p_payment_reference: payload?.payment_reference
     });
 
     if (error) {
