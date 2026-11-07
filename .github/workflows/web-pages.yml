@@ -29,6 +29,8 @@ jobs:
         run: npm install
       - name: Export web app
         run: npx expo export --platform web --output-dir dist
+      - name: Add installable web app metadata
+        run: node scripts/prepare-pwa.mjs
       - name: Upload website artifact
         uses: actions/upload-pages-artifact@v3
         with:
