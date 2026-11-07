@@ -1,0 +1,27 @@
+name: Generate NOOR Android icon
+on:
+  push:
+    paths:
+      - "public/noor-icon.svg"
+      - ".github/workflows/generate-app-icon.yml"
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  make-icon:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Convert SVG to 1024x1024 PNG
+        run: |
+          npm install --no-save sharp
+          mkdir -p assets
+          node -e "require('sharp')('public/noor-icon.svg').resize(1024,1024).png().toFile('assets/noor-icon.png')"
+      - name: Commit generated icon
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Add NOOR Android app icon"
+          file_pattern: assets/noor-icon.png
