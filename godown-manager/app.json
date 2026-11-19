@@ -9,9 +9,12 @@
     "android": {
       "package": "com.noor.godownmanager",
       "versionCode": 2,
-      "adaptiveIcon": {"backgroundColor":"#123B32"}
+      "adaptiveIcon": {
+        "backgroundColor": "#123B32"
+      }
     },
-    "plugins": ["@react-native-async-storage/async-storage"],
-    "extra": {"supabaseUrl":"https://veclohqqzckihibwkltz.supabase.co"}
+    "extra": {
+      "supabaseUrl": "https://veclohqqzckihibwkltz.supabase.co"
+    }
   }
 }
