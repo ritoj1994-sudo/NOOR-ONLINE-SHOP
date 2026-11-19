@@ -13,6 +13,7 @@ on:
       - 'package-lock.json'
       - 'assets/**'
       - 'lib/**'
+      - 'components/**'
       - 'scripts/**'
       - 'supabase/**'
       - '.github/workflows/android-debug-apk.yml'
