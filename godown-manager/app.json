@@ -1,0 +1,20 @@
+{
+  "expo": {
+    "name": "NOOR GODOWN MANAGER",
+    "slug": "noor-godown-manager",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "android": {
+      "package": "com.noor.godownmanager",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "backgroundColor": "#123B32"
+      }
+    },
+    "plugins": [
+      "@react-native-async-storage/async-storage"
+    ]
+  }
+}
