@@ -1,4 +1,5 @@
 name: Build NOOR Godown Manager APK
+# Android SDK setup uses supported platform-tools package
 on:
   workflow_dispatch:
   push:
