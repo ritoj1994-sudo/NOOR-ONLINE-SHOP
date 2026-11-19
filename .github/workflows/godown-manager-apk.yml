@@ -1,5 +1,4 @@
 name: Build NOOR Godown Manager APK
-# Android SDK setup uses supported platform-tools package
 on:
   workflow_dispatch:
   push:
@@ -26,6 +25,8 @@ jobs:
           java-version: '17'
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools,platforms;android-35,build-tools;35.0.0
       - name: Install packages
         run: npm install
       - name: Generate Android project
