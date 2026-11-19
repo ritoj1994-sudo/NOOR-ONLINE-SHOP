@@ -14,7 +14,7 @@ export default function App(){
  const [loading,setLoading]=useState(true),[busy,setBusy]=useState(false),[notice,setNotice]=useState("");
  const [name,setName]=useState(""),[phone,setPhone]=useState(""),[address,setAddress]=useState(""),[payment,setPayment]=useState("cod"),[paymentReference,setPaymentReference]=useState("");
  const [pName,setPName]=useState(""),[pPrice,setPPrice]=useState(""),[pStock,setPStock]=useState("10"),[pCategory,setPCategory]=useState(""),[pDesc,setPDesc]=useState(""),[pImage,setPImage]=useState(""),[pImageAsset,setPImageAsset]=useState(null);
- const [email,setEmail]=useState(ADMIN_EMAIL),[password,setPassword]=useState(""),[session,setSession]=useState(null),[authMode,setAuthMode]=useState("signup"),[orders,setOrders]=useState([]);
+ const [email,setEmail]=useState(ADMIN_EMAIL),[password,setPassword]=useState(""),[session,setSession]=useState(null),[authMode,setAuthMode]=useState("login"),[orders,setOrders]=useState([]);
  const [editProductId,setEditProductId]=useState(""),[editProductName,setEditProductName]=useState(""),[editProductPrice,setEditProductPrice]=useState(""),[editProductStock,setEditProductStock]=useState(""),[editProductDesc,setEditProductDesc]=useState("");
  const [trackId,setTrackId]=useState(""),[trackPhone,setTrackPhone]=useState(""),[trackedOrder,setTrackedOrder]=useState(null),[trackBusy,setTrackBusy]=useState(false);
 
