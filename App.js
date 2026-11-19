@@ -156,7 +156,7 @@ export default function App(){
  const statusLabel=v=>({pending:"নতুন",confirmed:"নিশ্চিত",processing:"প্রস্তুত হচ্ছে",shipped:"পাঠানো হয়েছে",delivered:"সম্পন্ন",cancelled:"বাতিল"}[v]||v);
 
  return <SafeAreaView style={s.safe}>
-  <View style={s.header}><View style={s.brandRow}><Image source={{uri:"https://ritoj1994-sudo.github.io/NOOR-ONLINE-SHOP/noor-icon.svg"}} style={s.brandIcon} resizeMode="contain"/><View><Text style={s.logo}>NOOR ONLINE SHOP</Text><Text style={s.sub}>বাংলাদেশের অনলাইন মার্কেটপ্লেস</Text></View></View></View>
+  <View style={s.header}><View style={s.brandRow}><Image source={require("./assets/noor-icon.png")} style={s.brandIcon} resizeMode="contain"/><View><Text style={s.logo}>NOOR ONLINE SHOP</Text><Text style={s.sub}>বাংলাদেশের অনলাইন মার্কেটপ্লেস</Text></View></View></View>
   <View style={s.nav}>{btn("শপ",()=>setPage("shop"),page==="shop")}{btn("কার্ট ("+count+")",()=>setPage("cart"),page==="cart")}{btn("অর্ডার ট্র্যাক",()=>setPage("track"),page==="track")}{btn("অ্যাডমিন",()=>setPage("admin"),page==="admin")}</View>
   {!!notice&&<TouchableOpacity style={s.notice} onPress={()=>setNotice("")}><Text style={s.noticeText}>{notice} ×</Text></TouchableOpacity>}
 
