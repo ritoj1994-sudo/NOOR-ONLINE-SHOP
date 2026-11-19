@@ -25,13 +25,14 @@ jobs:
           java-version: '17'
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
-        with:
-          packages: |
-            platform-tools
-            platforms;android-35
-            build-tools;35.0.0
+      - name: Install Android SDK packages
+        run: |
+          yes | sdkmanager --licenses
+          sdkmanager --install "platform-tools" "platforms;android-36" "build-tools;36.0.0"
       - name: Install packages
         run: npm install
+      - name: Check Expo configuration
+        run: npx expo-doctor
       - name: Generate Android project
         run: npx expo prebuild --platform android --non-interactive
       - name: Build release APK
