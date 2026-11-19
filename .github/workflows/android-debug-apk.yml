@@ -2,6 +2,9 @@ name: Build NOOR Android APK without EAS
 
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/android-debug-apk.yml'
 
 jobs:
   build-android:
