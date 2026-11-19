@@ -3,6 +3,7 @@ import {SafeAreaView,View,Text,TextInput,TouchableOpacity,FlatList,ScrollView,Al
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {supabase} from "./lib/supabase";
 import * as ImagePicker from "expo-image-picker";
+import {GodownManager} from "./components/GodownManager";
 
 const ADMIN_EMAIL="Ritoj1994@gmail.com";
 const money=n=>"৳"+Number(n||0).toLocaleString("en-BD");
@@ -157,10 +158,11 @@ export default function App(){
  const field=(v,fn,ph,extra={})=><TextInput style={s.input} value={v} onChangeText={fn} placeholder={ph} placeholderTextColor="#7b887f" {...extra}/>;
  const statusLabel=v=>({pending:"নতুন",confirmed:"নিশ্চিত",processing:"প্রস্তুত হচ্ছে",shipped:"পাঠানো হয়েছে",delivered:"সম্পন্ন",cancelled:"বাতিল"}[v]||v);
 
+ if(page==="godown")return <GodownManager onBack={()=>setPage("shop")}/>;
  return <SafeAreaView style={s.safe}>
   <StatusBar backgroundColor="#123b2b" barStyle="light-content" translucent={false}/>
   <View style={s.header}><View style={s.brandRow}><View style={s.brandIcon}><Text style={s.brandIconText}>NOOR</Text><Text style={s.brandCart}>🛒</Text></View><View style={s.brandText}><Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.72} style={[s.logo,narrow&&{fontSize:20}]}>NOOR ONLINE SHOP</Text><Text numberOfLines={2} style={s.sub}>বাংলাদেশের অনলাইন মার্কেটপ্লেস</Text></View></View></View>
-  <ScrollView horizontal showsHorizontalScrollIndicator={false} style={s.nav} contentContainerStyle={s.navContent}>{btn("শপ",()=>setPage("shop"),page==="shop")}{btn("কার্ট ("+count+")",()=>setPage("cart"),page==="cart")}{btn("অর্ডার ট্র্যাক",()=>setPage("track"),page==="track")}{btn("অ্যাডমিন",()=>setPage("admin"),page==="admin")}</ScrollView>
+  <ScrollView horizontal showsHorizontalScrollIndicator={false} style={s.nav} contentContainerStyle={s.navContent}>{btn("শপ",()=>setPage("shop"),page==="shop")}{btn("কার্ট ("+count+")",()=>setPage("cart"),page==="cart")}{btn("অর্ডার ট্র্যাক",()=>setPage("track"),page==="track")}{btn("অ্যাডমিন",()=>setPage("admin"),page==="admin")}{btn("গুদাম",()=>setPage("godown"),page==="godown")}</ScrollView>
   {!!notice&&<TouchableOpacity style={s.notice} onPress={()=>setNotice("")}><Text style={s.noticeText}>{notice} ×</Text></TouchableOpacity>}
 
   {page==="shop"&&<View style={{flex:1}}>
