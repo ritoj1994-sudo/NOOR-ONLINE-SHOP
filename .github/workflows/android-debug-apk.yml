@@ -1,4 +1,4 @@
-name: Build NOOR Android APK without EAS
+name: Build NOOR Android installable APK without EAS
 
 on:
   workflow_dispatch:
@@ -19,7 +19,7 @@ on:
 
 jobs:
   build-android:
-    name: Build installable debug APK
+    name: Build installable APK with bundled JavaScript
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -50,14 +50,14 @@ jobs:
       - name: Generate Android project
         run: npx expo prebuild --platform android --non-interactive
 
-      - name: Build debug APK
+      - name: Build release APK with bundled JavaScript
         working-directory: android
-        run: chmod +x gradlew && ./gradlew assembleDebug
+        run: chmod +x gradlew && ./gradlew assembleRelease
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: NOOR-ONLINE-SHOP-debug-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          name: NOOR-ONLINE-SHOP-installable-apk
+          path: android/app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error
           retention-days: 14
